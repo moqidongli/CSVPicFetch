@@ -119,23 +119,18 @@ for /f "usebackq skip=1 tokens=1-3 delims=," %%a in ("!current_csv!") do (
         set person_dir=!output_dir!\!job_id!_!name!
         if not exist "!person_dir!" mkdir "!person_dir!"
         
-        :: 下载图片
+        :: 下载文件
         if "!image_url!" neq "" (
             echo   下载!header3!...
             
             :: 获取文件扩展名
-            set img_ext=jpg
             for %%x in (!image_url!) do (
                 set temp_ext=%%~xx
                 set temp_ext=!temp_ext:~1!
-                if /i "!temp_ext!" equ "jpg" set img_ext=jpg
-                if /i "!temp_ext!" equ "jpeg" set img_ext=jpeg
-                if /i "!temp_ext!" equ "png" set img_ext=png
-                if /i "!temp_ext!" equ "gif" set img_ext=gif
-                if /i "!temp_ext!" equ "bmp" set img_ext=bmp
             )
-            
-            set img_filename=!name!_!header3!.!img_ext!
+            rem 如果 URL 没有扩展名，就默认用 bin
+            if "!temp_ext!"=="" set "temp_ext=bin"
+            set img_filename=!name!_!header3!.!temp_ext!
             curl -L -o "!person_dir!\!img_filename!" "!image_url!" > nul 2>&1
             if !errorlevel! equ 0 (
                 echo     ✓ !header3!下载成功: !img_filename!
